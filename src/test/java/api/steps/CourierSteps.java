@@ -32,6 +32,14 @@ public class CourierSteps {
                 .post("/api/v1/courier/login");
     }
 
+    @Step("Запрос на логина по имени и паролю")
+    public Response loginCourierRequest(String json) {
+        return given()
+                .header("Content-type", "application/json")
+                .body(json)
+                .post("/api/v1/courier/login");
+    }
+
     @Step("Запрос на удаление курьера по id")
     public Response deleteCourierRequest(String id) {
         return given()
