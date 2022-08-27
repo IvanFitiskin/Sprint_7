@@ -41,8 +41,8 @@ public class TryLoginCourierWithoutDataTest {
     }
 
     @Test
-    @DisplayName("Попытка авторизации курьера с несуществующей парой логин-пароль")
-    @Description("Попытка авторизации курьера с несуществующей парой логин-пароль")
+    @DisplayName("Попытка авторизации курьера без обязательных данных")
+    @Description("Попытка авторизации курьера без обязательных данных")
     public void tryLoginCourierWithoutDataTest() {
         Response response = courierSteps.loginCourierRequest(jsonData);
         response.then().assertThat()

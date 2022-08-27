@@ -55,8 +55,8 @@ public class TryLoginCourierWithWrongDataTest {
     }
 
     @Test
-    @DisplayName("Попытка авторизации курьера с несуществующей парой логин-пароль") // имя теста
-    @Description("Попытка авторизации курьера с несуществующей парой логин-пароль") // описание теста
+    @DisplayName("Попытка авторизации курьера с несуществующей парой логин-пароль")
+    @Description("Попытка авторизации курьера с несуществующей парой логин-пароль")
     public void tryLoginCourierWithWrongCredentialsTest() {
         Response response = courierSteps.loginCourierRequest(credentials);
         response.then().assertThat()

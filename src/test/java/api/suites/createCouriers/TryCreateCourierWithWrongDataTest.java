@@ -38,8 +38,8 @@ public class TryCreateCourierWithWrongDataTest {
     }
 
     @Test
-    @DisplayName("Создание курьера без обязательных полей") // имя теста
-    @Description("Попытка создать курьера без полей login, password и без двух полей одновременно") // описание теста
+    @DisplayName("Создание курьера без обязательных полей")
+    @Description("Попытка создать курьера без полей login, password и без двух полей одновременно")
     public void positiveCreateCourierTest() {
         Response response = given()
                 .header("Content-type", "application/json")

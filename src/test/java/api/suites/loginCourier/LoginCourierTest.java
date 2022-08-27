@@ -35,7 +35,9 @@ public class LoginCourierTest {
     @After
     public void tearDown() {
         // удаляем созданный аккаунт после теста
-        courierSteps.deleteCourierRequest(id);
+        if (id != null) {
+            courierSteps.deleteCourierRequest(id);
+        }
     }
 
     @Test
@@ -49,6 +51,8 @@ public class LoginCourierTest {
                 .statusCode(200);
 
         Courier courier = response.body().as(Courier.class);
+
+        // сохраняем id для блока After
         id = courier.getId();
     }
 }
