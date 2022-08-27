@@ -1,4 +1,4 @@
-package api.suites.couriers;
+package api.suites.createCouriers;
 
 import api.steps.CourierSteps;
 import io.restassured.RestAssured;

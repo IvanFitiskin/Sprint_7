@@ -1,4 +1,4 @@
-package api.suites.couriers;
+package api.suites.createCouriers;
 
 import api.steps.CourierSteps;
 import io.qameta.allure.Description;
@@ -44,7 +44,7 @@ public class TryCreateCourierWithEmptyDataTest {
     @Test
     @DisplayName("Создание курьера") // имя теста
     @Description("Попытка создать курьера с пустыми полями login и password") // описание теста
-    public void positiveCreateCourierTest() {
+    public void tryCreateCourierWithEmptyCredentialsTest() {
         Credentials credentials = new Credentials(login, password, "saske");
 
         Response response = courierSteps.createCourierRequest(credentials);
