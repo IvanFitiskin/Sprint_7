@@ -1,6 +1,7 @@
 package api.suites.createCouriers;
 
 import api.steps.CourierSteps;
+import io.qameta.allure.Epic;
 import io.qameta.allure.Step;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -12,9 +13,9 @@ import org.junit.Test;
 import io.qameta.allure.junit4.DisplayName;
 import io.qameta.allure.Description;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
+@Epic("Create courier")
 public class CreateCourierTest {
 
     private Credentials credentials;
@@ -65,7 +66,7 @@ public class CreateCourierTest {
                 .statusCode(409);
     }
 
-    public void deleteExistCourier(Credentials credentials) {
+    private void deleteExistCourier(Credentials credentials) {
         Response responseLogin = courierSteps.loginCourierRequest(credentials);
 
         if (responseLogin.statusCode() == 200) {

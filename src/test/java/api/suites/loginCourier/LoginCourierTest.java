@@ -2,6 +2,7 @@ package api.suites.loginCourier;
 
 import api.steps.CourierSteps;
 import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -13,6 +14,7 @@ import org.junit.Test;
 
 import static org.hamcrest.Matchers.notNullValue;
 
+@Epic("Login courier")
 public class LoginCourierTest {
 
     private Credentials credentials;

@@ -1,4 +1,7 @@
 target/*
 
+# allure
+.allure
+
 # trash
 .idea/*
