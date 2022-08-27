@@ -10,16 +10,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(Parameterized.class)
-public class TryCreateCourierWithoutDataTest {
-
-    private CourierSteps courierSteps;
+public class TryCreateCourierWithWrongDataTest {
 
     private String jsonData;
 
-    public TryCreateCourierWithoutDataTest(String jsonData) {
+    public TryCreateCourierWithWrongDataTest(String jsonData) {
         this.jsonData = jsonData;
     }
 
@@ -27,21 +26,26 @@ public class TryCreateCourierWithoutDataTest {
     public static Object[][] getData() {
         return new Object[][] {
                 { "{ \"login\": \"ninja\" }" },
-                { "{ \"password\": \"1234\" }" }
+                { "{ \"password\": \"1234\" }" },
+                { "{ \"password\": \"\" }" },
+                { "{ \"\": \"1234\" }" }
         };
     }
 
     @Before
     public void setUp() {
         RestAssured.baseURI= "http://qa-scooter.praktikum-services.ru";
-        courierSteps = new CourierSteps();
     }
 
     @Test
     @DisplayName("Создание курьера без обязательных полей") // имя теста
     @Description("Попытка создать курьера без полей login, password и без двух полей одновременно") // описание теста
     public void positiveCreateCourierTest() {
-        Response response = courierSteps.createCourierRequest(jsonData);
+        Response response = given()
+                .header("Content-type", "application/json")
+                .body(jsonData)
+                .post("/api/v1/courier");
+
         response.then().assertThat()
                 .body("message", equalTo("Недостаточно данных для создания учетной записи"))
                 .and()

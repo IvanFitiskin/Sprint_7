@@ -1,6 +1,7 @@
 package api.suites.createCouriers;
 
 import api.steps.CourierSteps;
+import io.qameta.allure.Step;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import model.Courier;
@@ -13,16 +14,6 @@ import io.qameta.allure.Description;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-
-
-// курьера можно создать; ++
-// нельзя создать двух одинаковых курьеров; ++
-// чтобы создать курьера, нужно передать в ручку все обязательные поля;
-// запрос возвращает правильный код ответа; ++
-// успешный запрос возвращает `ok: true`**;** ++
-// если одного из полей нет, запрос возвращает ошибку;
-// если создать пользователя с логином, который уже есть, возвращается ошибка.
 
 public class CreateCourierTest {
 
@@ -39,12 +30,18 @@ public class CreateCourierTest {
         courierSteps = new CourierSteps();
 
         // удаляем аккаунт, если он уже есть
-        deleteExactCourier(credentials);
+        deleteExistCourier(credentials);
+    }
+
+    @After
+    public void tearDown() {
+        // удаляем созданный аккаунт после теста
+        deleteExistCourier(credentials);
     }
 
     @Test
-    @DisplayName("Создание курьера") // имя теста
-    @Description("Обычный позитивный кейс создания нового курьера") // описание теста
+    @DisplayName("Создание курьера")
+    @Description("Обычный позитивный кейс создания нового курьера")
     public void positiveCreateCourierTest() {
         Response response = courierSteps.createCourierRequest(credentials);
         response.then().assertThat()
@@ -54,27 +51,21 @@ public class CreateCourierTest {
     }
 
     @Test
-    @DisplayName("Создание курьера дважды") // имя теста
-    @Description("Попытка создать курьера с данными уже зарегистрированного пользователя") // описание теста
+    @DisplayName("Попытка создания курьера дважды")
+    @Description("Попытка создать курьера с данными уже зарегистрированного пользователя")
     public void tryCreateCourierTwiceTest() {
         Response response = courierSteps.createCourierRequest(credentials);
         response.then().statusCode(201);
 
+        // Вызываем запрос второй раз с той же связкой логин-пароль
         Response secondResponse = courierSteps.createCourierRequest(credentials);
-        System.out.println(secondResponse.body().asString());
         secondResponse.then().assertThat()
                 .body("message", equalTo("Этот логин уже используется. Попробуйте другой."))
                 .and()
                 .statusCode(409);
     }
 
-    @After
-    public void tearDown() {
-        // удаляем созданный аккаунт после теста
-        deleteExactCourier(credentials);
-    }
-
-    public void deleteExactCourier(Credentials credentials) {
+    public void deleteExistCourier(Credentials credentials) {
         Response responseLogin = courierSteps.loginCourierRequest(credentials);
 
         if (responseLogin.statusCode() == 200) {

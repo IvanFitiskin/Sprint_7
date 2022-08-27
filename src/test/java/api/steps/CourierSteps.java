@@ -16,14 +16,6 @@ public class CourierSteps {
                 .post("/api/v1/courier");
     }
 
-    @Step("Запрос на создание нового курьера")
-    public Response createCourierRequest(String json) {
-        return given()
-                .header("Content-type", "application/json")
-                .body(json)
-                .post("/api/v1/courier");
-    }
-
     @Step("Запрос на логина по имени и паролю")
     public Response loginCourierRequest(Credentials credentials) {
         return given()
