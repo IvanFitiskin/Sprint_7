@@ -2,7 +2,6 @@ package client;
 
 import io.qameta.allure.Step;
 import io.restassured.response.ValidatableResponse;
-import model.Courier;
 import model.Order;
 
 import static io.restassured.RestAssured.given;
