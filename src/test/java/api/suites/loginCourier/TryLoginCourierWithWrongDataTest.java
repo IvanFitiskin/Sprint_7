@@ -1,30 +1,29 @@
 package api.suites.loginCourier;
 
-import api.steps.CourierSteps;
+import client.CourierClient;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
-import model.Courier;
-import model.Credentials;
+import io.restassured.response.ValidatableResponse;
+import model.CourierCredentials;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import static org.hamcrest.Matchers.equalTo;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.junit.Assert.assertEquals;
 
 @Epic("Login courier")
 @RunWith(Parameterized.class)
 public class TryLoginCourierWithWrongDataTest {
 
-    private CourierSteps courierSteps;
+    private CourierClient courierClient;
 
-    private String login;
-    private String password;
+    private final String login;
+    private final String password;
 
-    private Credentials credentials;
+    private CourierCredentials courierCredentials;
 
     public TryLoginCourierWithWrongDataTest(String login, String password) {
         this.login = login;
@@ -41,18 +40,15 @@ public class TryLoginCourierWithWrongDataTest {
 
     @Before
     public void setUp() {
-        RestAssured.baseURI= "http://qa-scooter.praktikum-services.ru";
-
-        credentials = new Credentials(login, password, "saske");
-        courierSteps = new CourierSteps();
+        courierCredentials = new CourierCredentials(login, password);
+        courierClient = new CourierClient();
 
         // Если аккаунт курьера существует - удаляем его
-        Response responseLogin = courierSteps.loginCourierRequest(credentials);
+        ValidatableResponse responseLogin = courierClient.login(courierCredentials);
 
-        if (responseLogin.statusCode() == 200) {
-            Courier courier = responseLogin.body().as(Courier.class);
-            String id = courier.getId();
-            courierSteps.deleteCourierRequest(id).then().statusCode(200);
+        if (responseLogin.extract().statusCode() == 200) {
+            int id = responseLogin.extract().path("id");
+            courierClient.delete(id).statusCode(200);
         }
     }
 
@@ -60,11 +56,13 @@ public class TryLoginCourierWithWrongDataTest {
     @DisplayName("Попытка авторизации курьера с несуществующей парой логин-пароль")
     @Description("Попытка авторизации курьера с несуществующей парой логин-пароль")
     public void tryLoginCourierWithWrongCredentialsTest() {
-        Response response = courierSteps.loginCourierRequest(credentials);
-        response.then().assertThat()
-                .body("message", equalTo("Учетная запись не найдена"))
-                .and()
-                .statusCode(404);
+        ValidatableResponse response = courierClient.login(courierCredentials);
+
+        int statusCode = response.extract().statusCode();
+        assertEquals("Status code is not corrected", SC_NOT_FOUND, statusCode);
+
+        String message = response.extract().path("message");
+        assertEquals("Wrong response message", "Учетная запись не найдена", message);
     }
 
 }

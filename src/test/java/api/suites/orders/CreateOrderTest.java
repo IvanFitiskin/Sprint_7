@@ -1,22 +1,25 @@
 package api.suites.orders;
 
+import client.OrderClient;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
-import model.OrderData;
+import io.restassured.response.ValidatableResponse;
+import model.Order;
+import model.OrderGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.apache.http.HttpStatus.SC_CREATED;
+import static org.junit.Assert.*;
 
 @Epic("Create order")
 @RunWith(Parameterized.class)
 public class CreateOrderTest {
+
+    private OrderClient orderClient;
 
     private final String[] color;
 
@@ -36,33 +39,21 @@ public class CreateOrderTest {
 
     @Before
     public void setUp() {
-        RestAssured.baseURI= "http://qa-scooter.praktikum-services.ru";
+        orderClient = new OrderClient();
     }
 
     @Test
     @DisplayName("Создание заказа")
     @Description("Обычный позитивный кейс создания нового заказа")
     public void positiveCreateOrderTest() {
-        OrderData orderData = new OrderData(
-                "Naruto",
-                "Uchiha",
-                "Konoha, 142 apt.",
-                "4",
-                "+7 800 355 35 35",
-                5,
-                "2020-06-06",
-                "Saske, come back to Konoha",
-                color
-        );
+        Order order = OrderGenerator.getOrderByColor(color);
 
-        Response response = given()
-                .header("Content-type", "application/json")
-                .body(orderData)
-                .post("/api/v1/orders");
+        ValidatableResponse response = orderClient.create(order);
 
-        response.then().assertThat()
-                .body("track", notNullValue())
-                .and()
-                .statusCode(201);
+        int statusCode = response.extract().statusCode();
+        assertEquals("Status code is not corrected", SC_CREATED, statusCode);
+
+        int isCreated = response.extract().path("track");
+        assertNotEquals("Order is not created", 0, isCreated);
     }
 }

@@ -1,44 +1,44 @@
 package api.suites.loginCourier;
 
-import api.steps.CourierSteps;
+import client.CourierClient;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import model.Courier;
-import model.Credentials;
+import model.CourierCredentials;
+import model.CourierGenerator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.notNullValue;
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.junit.Assert.*;
 
 @Epic("Login courier")
 public class LoginCourierTest {
 
-    private Credentials credentials;
-    private String id;
+    private CourierCredentials courierCredentials;
+    private int courierId;
 
-    private CourierSteps courierSteps;
+    private CourierClient courierClient;
 
     @Before
     public void setUp() {
-        RestAssured.baseURI= "http://qa-scooter.praktikum-services.ru";
+        Courier courier = CourierGenerator.getDefault();
+        courierCredentials = CourierCredentials.from(courier);
 
-        credentials = new Credentials("ninja42", "1234", "saske");
-
-        courierSteps = new CourierSteps();
+        courierClient = new CourierClient();
 
         // создаем нового курьера
-        courierSteps.createCourierRequest(credentials);
+        courierClient.create(courier);
     }
 
     @After
     public void tearDown() {
         // удаляем созданный аккаунт после теста
-        if (id != null) {
-            courierSteps.deleteCourierRequest(id);
+        if (courierId != 0) {
+            courierClient.delete(courierId);
         }
     }
 
@@ -46,15 +46,12 @@ public class LoginCourierTest {
     @DisplayName("Авторизация курьера")
     @Description("Обычный позитивный кейс авторизации курьера")
     public void positiveLoginCourierTest() {
-        Response response = courierSteps.loginCourierRequest(credentials);
-        response.then().assertThat()
-                .body("id", notNullValue())
-                .and()
-                .statusCode(200);
+        ValidatableResponse response = courierClient.login(courierCredentials);
 
-        Courier courier = response.body().as(Courier.class);
+        int statusCode = response.extract().statusCode();
+        assertEquals("Status code is not corrected", SC_OK, statusCode);
 
-        // сохраняем id для блока After
-        id = courier.getId();
+        courierId = response.extract().path("id");
+        assertNotEquals("path id is null", 0, courierId);
     }
 }

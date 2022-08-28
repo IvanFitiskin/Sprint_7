@@ -1,20 +1,16 @@
 package model;
 
-public class Credentials {
+public class CourierCredentials {
 
     private String login;
-
     private String password;
 
-    private String firstName;
-
-    public Credentials(String login, String password, String firstName) {
+    public CourierCredentials(String login, String password) {
         this.login = login;
         this.password = password;
-        this.firstName = firstName;
     }
 
-    public Credentials() {
+    public CourierCredentials() {
     }
 
     public String getLogin() {
@@ -25,10 +21,6 @@ public class Credentials {
         return password;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
     public void setLogin(String login) {
         this.login = login;
     }
@@ -37,7 +29,8 @@ public class Credentials {
         this.password = password;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public static CourierCredentials from(Courier courier) {
+        return new CourierCredentials(courier.getLogin(), courier.getPassword());
     }
+
 }
